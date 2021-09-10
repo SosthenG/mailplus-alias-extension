@@ -7,6 +7,8 @@ However, feel free to open an issue or contribute if you find a bug or want to i
 
 This extension allows you to create email aliases for your Synology MailPlus account directly from your browser. Idea is the same as [Firefox Relay](https://relay.firefox.com/) but with your own server, own domain and with no limitation because you can create as much alias as you want for your MailPlus account.
 
+![demo](demo.png)
+
 ## Target
 
 This extension can only be used by people using [Synology MailPlus Server](https://www.synology.com/fr-fr/dsm/feature/mailplus).
