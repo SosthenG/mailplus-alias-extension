@@ -5,7 +5,7 @@ html {
 
 body {
     width: 500px;
-    max-height: 600px;
+    height: 500px;
     overflow: hidden;
     margin: 0;
     padding: 0;
@@ -32,59 +32,70 @@ header > h4 {
 }
 
 header > div#message {
-    padding: 10px 15px;
+    width: 480px;
+    padding: 10px 30px 10px 15px;
     margin: 10px;
     border-radius: 10px;
-    transition: visibility 0s, opacity 0.5s ease-in;
-    top: 0;
-    visibility: visible;
-    opacity: 1;
-}
-header > div#message.hidden {
-    visibility: hidden;
-    opacity: 0;
+    transition: all 0.5s ease-in;
     position: absolute;
-    top: -50px;
+    top: -60px;
+    z-index: 100;
+    color: white;
+    min-height: 50px;
+    background-color: #505050;
 }
+
+header > div#message.active {
+    top: 5px;
+}
+
 header > div#message.success {
-    background-color: rgba(0,104,10,0.60)
+    background-color: #045B0C;
 }
+
 header > div#message.error {
-    background-color: rgba(241, 56, 56, 0.60)
+    background-color: #A40505;
+}
+
+header > div#message > span#close-msg {
+    position: absolute;
+    top: -3px;
+    right: 10px;
+    font-weight: bold;
+    font-size: 2em;
+    cursor: pointer;
+}
+
+header > div#message > span#close-msg:hover {
+    color: var(--primary-hover);
 }
 
 header > h4 span.mailplus {
     color: var(--primary-hover);
 }
 
-#back-arrow {
-    display: none;
-    position: absolute;
-    left: 10px;
-    top: 15px;
-    cursor: pointer;
-}
-#back-arrow:hover {
-    color: var(--primary-hover);
-}
-#back-arrow.visible {
-    display: block;
-}
-
 table#aliases {
     width: 100%;
 }
+
 table#aliases > tbody {
     display: block;
-    height: 300px;
+    height: 260px;
     overflow: auto;
     width: 100%;
+    border-bottom: 3px solid var(--table-border-color);
 }
+
 table#aliases > thead, table#aliases > tbody > tr {
     display: table;
     width: 100%;
     table-layout: fixed;
 }
+
+table#aliases td {
+    border-bottom: var(--border-width) solid var(--table-border-color) !important;
+}
+
 table#aliases .alias {
     width: 40%;
     overflow: hidden;
@@ -103,7 +114,7 @@ table#aliases .delete {
     width: 10%;
 }
 table#aliases > thead {
-    width: calc( 100% - 1em );
+    width: 100%;
 }
 
 table#aliases tr:first-child td[data-tooltip]:before, table#aliases tr:first-child td[data-tooltip]:after {
@@ -122,7 +133,7 @@ input[type="text"], input[type="password"] {
     height: 30px !important;
 }
 
-button {
+button, select {
     padding: 2px !important;
 }
 
@@ -139,13 +150,36 @@ button {
     width: 100%;
 }
 
-.inline > div {
-    display: inline-block;
+form.inline-form {
+    display: flex;
+    flex-direction: row;
+}
+
+form.inline-form > div.input-inline {
+    flex-grow: 2;
+}
+
+form.inline-form > div.btn-inline {
+    flex-grow: 1;
+    padding-left: 10px;
+    padding-top: 4px;
+}
+
+form.inline-form > label.label-inline {
+    flex-grow: 1;
+    padding-top: 4px;
+    padding-right: 10px;
+    font-weight: bold;
+}
+
+form.inline-form > select.select-inline {
+    flex-grow: 2;
 }
 
 .mt-2 {
     margin-top: 2em;
 }
+
 .mr-1 {
     margin-right: 1em;
 }
@@ -242,9 +276,6 @@ span.number {
     margin-left: -5px;
     margin-top: -4px;
 }
-.gg-copy.green, .gg-copy.green:hover, .gg-copy.green:active {
-    color: #2E7D32 !important;
-}
 
 .gg-copy::after,
 .gg-copy::before {
@@ -298,34 +329,4 @@ span.number {
     top: -4px;
     right: -1px;
     transform: rotate(45deg)
-}
-
-.gg-arrow-left {
-    box-sizing: border-box;
-    position: relative;
-    display: block;
-    width: 22px;
-    height: 22px
-}
-.gg-arrow-left::after,
-.gg-arrow-left::before {
-    content: "";
-    display: block;
-    box-sizing: border-box;
-    position: absolute;
-    left: 3px
-}
-.gg-arrow-left::after {
-    width: 8px;
-    height: 8px;
-    border-bottom: 2px solid;
-    border-left: 2px solid;
-    transform: rotate(45deg);
-    bottom: 7px
-}
-.gg-arrow-left::before {
-    width: 16px;
-    height: 2px;
-    bottom: 10px;
-    background: currentColor
 }

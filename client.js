@@ -1,10 +1,4 @@
-export const confStatuses = {
-    OK: 'main',
-    NEED_CONFIG: 'config',
-    NEED_INIT: 'init',
-};
-
-export function isEmpty(value){
+export function isEmpty(value) {
     if (value === true) {
         return false;
     }
@@ -12,15 +6,22 @@ export function isEmpty(value){
 }
 
 export class Client {
-    complete_url;
-    username;
-    domain_id;
-    domain_name;
-    cookies_ok = false;
-    blacklist;
-    aliases;
+    constructor() {
+        this.complete_url = null;
+        this.username = null;
+        this.domain_id = null;
+        this.domain_name = null;
+        this.cookies_ok = false;
+        this.blacklist = null;
+        this.aliases = null;
+        this.init_ok = false;
+    }
 
     async loadSavedConf() {
+        if (this.init_ok) {
+            return true;
+        }
+
         const saved_data = await browser.storage.local.get();
         this.complete_url = saved_data.complete_url;
         this.username = saved_data.username;
@@ -28,16 +29,9 @@ export class Client {
         this.domain_name = saved_data.domain_name;
         this.cookies_ok = saved_data.cookies_ok;
 
-        let status = confStatuses.NEED_INIT;
-        if (!isEmpty(this.complete_url) && !isEmpty(this.username) && !isEmpty(this.cookies_ok)) {
-            if (!isEmpty(this.domain_id) && !isEmpty(this.domain_name)) {
-                status = confStatuses.OK;
-            } else {
-                status = confStatuses.NEED_CONFIG;
-            }
-        }
+        this.init_ok = !isEmpty(this.complete_url) && !isEmpty(this.username) && !isEmpty(this.cookies_ok);
 
-        return status;
+        return this.init_ok;
     }
 
     set url(url) {
@@ -84,7 +78,7 @@ export class Client {
                 }).then(() => {
                 }, () => {
                     console.error('Cannot save url to local storage!');
-                })
+                });
 
                 return true;
             }
@@ -188,6 +182,10 @@ export class Client {
         });
     }
 
+    getSavedDomain() {
+        return isEmpty(this.domain_id) ? null : {id: parseInt(this.domain_id), name: this.domain_name};
+    }
+
     saveCookiesOk(ok) {
         this.cookies_ok = ok;
         return browser.storage.local.set({
@@ -241,6 +239,8 @@ export class Client {
 
         delete this.aliases[alias];
 
+        this.blockAlias(alias, true); // Safety, we are blocking the alias so the mailserver reject all emails to it.
+
         if (data !== null) {
             return this.aliases;
         }
@@ -248,7 +248,7 @@ export class Client {
         return null;
     }
 
-    async createAlias(alias = '') {
+    async createAlias(alias = '', simple_return = false) {
         if (isEmpty(alias)) {
             alias = this.generateAlias();
         }
@@ -270,9 +270,22 @@ export class Client {
             return null;
         }
 
+        // Unblock the alias (in case it existed and was deleted before)
+        if (isEmpty(this.blacklist)) {
+            await this.fetchBlacklist();
+        }
+        if (!isEmpty(this.blacklist) && !isEmpty(this.blacklist[alias]) && this.blacklist[alias].enabled) {
+            console.debug('UNBLOCK NEW ALIAS', alias);
+            await this.blockAlias(alias, false);
+        }
+
+        if (simple_return) {
+            return this.getEmailFromAlias(alias);
+        }
+
         this.aliases[alias] = this.getEmailFromAlias(alias);
 
-        return { 'new': alias, 'aliases': this.aliases };
+        return {'new': alias, 'aliases': this.aliases};
     }
 
     async fetchStats() {

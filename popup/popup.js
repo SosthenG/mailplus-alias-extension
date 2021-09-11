@@ -1,19 +1,19 @@
-import { Client } from '../client.js';
+import {Client} from '../client.js';
 
-const evt = document.createEvent("HTMLEvents");
-evt.initEvent("change", false, true);
-const msgContainer = document.getElementById('message');
+const msg_container = document.getElementById('message');
+const text_msg = document.getElementById('text-msg');
+const close_msg = document.getElementById('close-msg');
 
 export async function loadPopup(name) {
-    msgContainer.innerHTML = '';
-    msgContainer.className = 'hidden';
+    msg_container.className = '';
 
     document.querySelectorAll('script[data-loaded="true"]').forEach((elem) => {
-       elem.remove();
+        elem.remove();
     });
 
     let container = document.querySelector('main');
     container.setAttribute('aria-busy', true);
+    container.innerHTML = '';
 
     let res = await fetch(`${name}/${name}.html`);
 
@@ -25,24 +25,25 @@ export async function loadPopup(name) {
     script.type = 'module';
     script.setAttribute('data-loaded', 'true');
     document.querySelector('body').appendChild(script);
-
-    let current_page_input = document.getElementById('current-page');
-    current_page_input.value = name;
-    current_page_input.dispatchEvent(evt);
 }
 
+let timeout;
 export function showMessage(message, status = 'error', hide_delay = 5000) {
-    msgContainer.className = '';
-    msgContainer.innerHTML = message;
-    msgContainer.classList.add(status);
-    setTimeout(() => {
-        msgContainer.innerHTML = '';
-        msgContainer.className = 'hidden';
+    clearTimeout(timeout);
+    msg_container.className = 'active';
+    text_msg.innerHTML = message;
+    msg_container.classList.add(status);
+    timeout = setTimeout(() => {
+        msg_container.className = '';
     }, hide_delay);
+    close_msg.addEventListener('click', () => {
+        clearTimeout(timeout);
+        msg_container.className = '';
+    });
 }
 
 export const client = new Client();
 
-client.loadSavedConf().then(async (status) => {
-    loadPopup(status);
+client.loadSavedConf().then(async (ok) => {
+    loadPopup((ok ? 'main' : 'init'));
 });

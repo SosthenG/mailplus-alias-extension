@@ -1,4 +1,4 @@
-import { client, showMessage, loadPopup } from '../popup.js';
+import {client, showMessage, loadPopup} from '../popup.js';
 
 let btn = document.forms['init'].querySelector('button');
 document.forms['init'].addEventListener('submit', async (e) => {
@@ -15,10 +15,10 @@ document.forms['init'].addEventListener('submit', async (e) => {
         return;
     }
 
-    const login_ok = await client.login(formData.get('username'), formData.get('password'), formData.get('otp'))
+    const login_ok = await client.login(formData.get('username'), formData.get('password'), formData.get('otp'));
 
     if (login_ok) {
-        loadPopup('config');
+        loadPopup('main');
     } else {
         btn.removeAttribute('aria-busy');
         showMessage('Login, password or OTP invalid.');

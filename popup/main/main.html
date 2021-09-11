@@ -1,22 +1,27 @@
+<form name="domain-form" class="inline-form">
+    <label for="domain" class="label-inline">Domain</label>
+    <select id="domain" class="select-inline" name="domain" required disabled></select>
+</form>
+
 <table role="grid" id="aliases">
     <thead>
         <tr>
-            <th colspan="2" class="alias">Alias</th>
+            <th class="alias">Alias</th>
             <th class="stats">Forwards</th>
             <th class="block">Enabled</th>
             <th class="delete"></th>
             <th class="copy"></th>
         </tr>
     </thead>
-    <tbody id="aliases-container" aria-busy="true"></tbody>
+    <tbody id="aliases-container"></tbody>
 </table>
-<form name="add-alias" class="inline mt-2">
-    <div class="w-100">
+<form name="add-alias" class="inline-form">
+    <div class="input-inline">
         <label>
             <input type="text" placeholder="Alias name (optional)" name="alias">
         </label>
     </div>
-    <div class="w-100">
-        <button type="submit" class="w-100">Create new alias</button>
+    <div class="btn-inline">
+        <button type="submit">Create new alias</button>
     </div>
 </form>
