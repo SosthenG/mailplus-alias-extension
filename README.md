@@ -1,7 +1,12 @@
 # MailPlus Alias Extension
 
+[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/SosthenG/mailplus-alias-extension/blob/master/LICENSE.md)
+[![Mozilla Add-on](https://img.shields.io/amo/dw/mailplus-alias)](https://addons.mozilla.org/fr/firefox/addon/mailplus-alias/)
+
 :warning: This project is still in development. I built it for my own needs, so it might not suit yours. However, feel free to open an issue or contribute if you find a bug or want to improve this
 extension.
+
+[Download on addons.mozilla.org](https://addons.mozilla.org/fr/firefox/addon/mailplus-alias/)
 
 ## Features
 
@@ -25,14 +30,26 @@ will be unblocked.
 
 You can see the number of forwarded emails for a given alias just next to it.
 
-## Target
+## Only for Synology MailPlus
 
-This extension can only be used by people using [Synology MailPlus Server](https://www.synology.com/fr-fr/dsm/feature/mailplus). Please also note that your DSM account need to have the "MailPlus
-Server" permission. This will not work with the "MailPlus" permission as alias creation is made on the server side.
+This extension can only be used by default by administrators of a [Synology MailPlus Server](https://www.synology.com/fr-fr/dsm/feature/mailplus). DSM users that are not administrators need to have a
+delegated permission to access aliases and security features.
 
-:warning: Accounts with this permission will have access to the entire configuration of your email server, so it should only be given to the server administrator.
+To delegate the access, the administrator need to open the MailPlus Server application in DSM and do the following:
 
-This extension has only been tested with Firefox 91.0.2 yet, so it might not work with others versions and probably will not with other browser. Support to more browsers might be added later.
+* Go to "Account" > "Delegation"
+* Click on "+" to add a delegation
+* Select the "Custom" delegation profile
+* Check "Domain > Alias" and "Security > Mail Delivery Security" (to block/unblock aliases)
+* Add the users or group you want to have those permissions in the second tab
+* Click "OK"
+
+:warning: This extension does not allow touching other user's data, however with the previous DSM permissions, the users will in theory be able to edit EVERY blacklist/whitelist rules, other "Mail
+Delivery Security" features and EVERY alias for every user from the DSM interface or with API requests.
+
+## Install
+
+[Download on addons.mozilla.org](https://addons.mozilla.org/fr/firefox/addon/mailplus-alias/)
 
 ## Build
 

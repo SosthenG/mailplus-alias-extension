@@ -99,7 +99,6 @@ export class Client {
             method: 'login',
             account: username,
             passwd: password,
-            session: 'MailPlus-Alias-Extension',
             format: 'cookie'
         });
         if (otp) {
@@ -203,14 +202,21 @@ export class Client {
             limit: limit,
             action: 'enum',
             domain_id: this.domain_id,
-            query: '""',
+            query: `"${this.username}"`,
+            additional: '["member"]'
         });
 
         const data = await this.getResponse(params);
 
         for (let key in data.alias_list) {
             let item = data.alias_list[key];
-            aliases[item.name] = this.getEmailFromAlias(item.name);
+            for (let member_key in item.member_list) {
+                // Ensure only current user aliases are displayed (DSM permission allow to see everything)
+                if (item.member_list[member_key].name === this.username) {
+                    aliases[item.name] = this.getEmailFromAlias(item.name);
+                    break;
+                }
+            }
         }
 
         let new_offset = offset + limit;
@@ -271,11 +277,8 @@ export class Client {
         }
 
         // Unblock the alias (in case it existed and was deleted before)
-        if (isEmpty(this.blacklist)) {
-            await this.fetchBlacklist();
-        }
+        await this.fetchBlacklist();
         if (!isEmpty(this.blacklist) && !isEmpty(this.blacklist[alias]) && this.blacklist[alias].enabled) {
-            console.debug('UNBLOCK NEW ALIAS', alias);
             await this.blockAlias(alias, false);
         }
 
