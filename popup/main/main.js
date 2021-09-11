@@ -9,20 +9,23 @@ client.fetchDomains().then((returned_domains) => {
         const container = document.querySelector("select#domain");
         let first = true;
         let saved_domain = client.getSavedDomain();
-        for (let domain_key in returned_domains) {
-            let domain = returned_domains[domain_key];
-            domains[domain.domain_id] = domain.name;
+        if (!isEmpty(saved_domain) && (!saved_domain.id in returned_domains)) {
+            saved_domain = null;
+        }
+        for (let domain_id in returned_domains) {
+            let domain_name = returned_domains[domain_id];
+            domains[domain_id] = domain_name;
             let option = document.createElement('option');
-            option.value = domain.domain_id;
-            option.text = domain.name;
+            option.value = domain_id;
+            option.text = domain_name;
             if (first && saved_domain === null) {
                 option.selected = true;
-                client.saveDomain(domain.domain_id, domain.name).then(() => {
+                client.saveDomain(domain_id, domain_name).then(() => {
                     loadAliases();
                 }, (error) => {
                     showMessage('Cannot save domain: ' + error);
                 });
-            } else if (saved_domain !== null && saved_domain.id === domain.domain_id) {
+            } else if (saved_domain !== null && saved_domain.id == domain_id) {
                 option.selected = true;
                 loadAliases();
             }
@@ -45,11 +48,16 @@ client.fetchDomains().then((returned_domains) => {
             });
         });
     }
+}).catch((e) => {
+    console.error('Cannot fetch domains. You might be missing a required permission.', e);
+    showMessage('Cannot fetch domains. You might be missing a required permission.');
 });
 
 const aliases_container = document.getElementById('aliases-container');
 const no_aliases = '<tr><td colspan="5">No aliases yet.</td></tr>';
 var aliases = null;
+var has_stats = true;
+var has_blacklist = true;
 
 function addAlias(alias, email, create = false) {
     if (aliases_container.innerHTML === no_aliases) {
@@ -65,12 +73,12 @@ function addAlias(alias, email, create = false) {
 
     let stats_td = tr.insertCell();
     stats_td.classList.add('stats');
-    stats_td.setAttribute('data-tooltip', 'Forwards count');
+    stats_td.setAttribute('data-tooltip', has_stats ? 'Forwards count' : 'Unavailable');
     stats_td.appendChild(document.createTextNode('0'));
 
     let block_td = tr.insertCell();
     block_td.classList.add('block');
-    block_td.setAttribute('data-tooltip', 'Disable (block) / Enable (forward)');
+    block_td.setAttribute('data-tooltip', has_blacklist ? 'Disable (block) / Enable (forward)' : 'Unavailable');
 
     let enable_label = document.createElement('label');
     enable_label.htmlFor = 'enable-' + alias;
@@ -85,12 +93,15 @@ function addAlias(alias, email, create = false) {
     block_td.appendChild(enable_label);
     enabled_checkbox.addEventListener('change', () => {
         client.blockAlias(alias, !enabled_checkbox.checked).then((success) => {
-            let state_str = enabled_checkbox.checked ? 'unblocked' : 'blocked';
+            let state_str = enabled_checkbox.checked ? 'enabled (forward)' : 'disabled (blocked)';
             if (success) {
                 showMessage(`"${alias}" as been ${state_str}!`, 'success');
             } else {
                 showMessage(`Cannot ${state_str} alias "${alias}".`);
             }
+        }).catch((e) => {
+            console.error(e);
+            showMessage(`Cannot ${state_str} alias "${alias}". You might be missing a permission.`);
         });
     });
 
@@ -139,18 +150,26 @@ function loadAliases() {
                 addAlias(alias, aliases[alias]);
             }
         }
+        document.getElementById('create-btn').disabled = false;
 
         // Add forward stats
         client.fetchStats().then((aliases_stats) => {
+            has_stats = true;
             for (let alias in aliases_stats) {
                 let elem = document.querySelector('tbody > tr[data-alias="' + alias + '"] > td.stats');
                 if (elem !== null) {
                     elem.innerHTML = aliases_stats[alias];
                 }
             }
+        }).catch(() => {
+            has_stats = false;
+            document.querySelectorAll('tbody td.stats').forEach((elem) => {
+                elem.setAttribute('data-tooltip', 'Unavailable');
+            });
         });
 
         client.fetchBlacklist().then((blacklist) => {
+            has_blacklist = true;
             document.querySelectorAll('tbody > tr[data-alias] > td.block input[type="checkbox"]').forEach((checkbox) => {
                 checkbox.disabled = false;
             });
@@ -160,7 +179,15 @@ function loadAliases() {
                     alias_blocked_checkbox.checked = !(alias in blacklist && blacklist[alias].enabled === true);
                 }
             }
+        }).catch(() => {
+            has_blacklist = false;
+            document.querySelectorAll('tbody td.block').forEach((elem) => {
+                elem.setAttribute('data-tooltip', 'Unavailable');
+            });
         });
+    }).catch((e) => {
+        console.error('Cannot fetch aliases. You might be missing a required permission.', e);
+        showMessage('Cannot fetch aliases. You might be missing a required permission.');
     });
 }
 

@@ -38,15 +38,15 @@ header > div#message {
     border-radius: 10px;
     transition: all 0.5s ease-in;
     position: absolute;
-    top: -60px;
+    top: -100px;
     z-index: 100;
-    color: white;
+    color: transparent;
     min-height: 50px;
-    background-color: #505050;
 }
 
 header > div#message.active {
     top: 5px;
+    color: white;
 }
 
 header > div#message.success {
@@ -103,15 +103,19 @@ table#aliases .alias {
 }
 table#aliases .stats {
     width: 20%;
+    text-align: center;
 }
 table#aliases .block {
     width: 20%;
+    text-align: center;
 }
 table#aliases .copy {
     width: 10%;
+    text-align: center;
 }
 table#aliases .delete {
     width: 10%;
+    text-align: center;
 }
 table#aliases > thead {
     width: 100%;

@@ -147,7 +147,7 @@ export class Client {
         const result = await response.json();
         if (!result.success) {
             console.error('Request error', status, result, params.toString());
-            if (result.error.code === 119) {
+            if (result.error.code === 119) { // Session cookie probably invalid, disconnect
                 this.saveCookiesOk(false).then(() => {
                     loadPopup('init');
                 });
@@ -169,7 +169,42 @@ export class Client {
 
         const data = await this.getResponse(params);
 
-        return data.domains;
+        let domains = {};
+        for (let key in data.domains) {
+            // If user does not have access to the domain, remove it from the list
+            let is_in_domain = await this.isUserInDomain(data.domains[key].domain_id);
+            if (is_in_domain) {
+                domains[data.domains[key].domain_id] = data.domains[key].name;
+            }
+        }
+
+        return domains;
+    }
+
+    async isUserInDomain(domain_id) {
+        const params = new URLSearchParams({
+            api: 'SYNO.MailPlusServer.Util',
+            version: '1',
+            method: 'list_user',
+            action: 'find',
+            offset: 0,
+            limit: 50, // Should be enough (with 1 we can miss if multiple users have a close name)
+            query: `"${this.username}"`,
+            domain_id: domain_id,
+        });
+
+        const data = await this.getResponse(params);
+
+        if (data.total > 0) {
+            for (let key in data.user_list) {
+                let user = data.user_list[key];
+                if (user.name === this.username) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     saveDomain(id, name) {
@@ -210,12 +245,9 @@ export class Client {
 
         for (let key in data.alias_list) {
             let item = data.alias_list[key];
-            for (let member_key in item.member_list) {
-                // Ensure only current user aliases are displayed (DSM permission allow to see everything)
-                if (item.member_list[member_key].name === this.username) {
-                    aliases[item.name] = this.getEmailFromAlias(item.name);
-                    break;
-                }
+            // Ensure only current user aliases (and if only owned by this user) are displayed (DSM permission allow to see everything)
+            if (item.member_list.length === 1 && item.member_list[0].name === this.username) {
+                aliases[item.name] = this.getEmailFromAlias(item.name);
             }
         }
 
@@ -277,9 +309,13 @@ export class Client {
         }
 
         // Unblock the alias (in case it existed and was deleted before)
-        await this.fetchBlacklist();
-        if (!isEmpty(this.blacklist) && !isEmpty(this.blacklist[alias]) && this.blacklist[alias].enabled) {
-            await this.blockAlias(alias, false);
+        try {
+            await this.fetchBlacklist();
+            if (!isEmpty(this.blacklist) && !isEmpty(this.blacklist[alias]) && this.blacklist[alias].enabled) {
+                await this.blockAlias(alias, false);
+            }
+        } catch (e) {
+            // Blacklist permission is optional, so this can fail silently
         }
 
         if (simple_return) {
@@ -343,6 +379,9 @@ export class Client {
     }
 
     async blockAlias(alias, blocked) {
+        if (this.blacklist === null) {
+            return null;
+        }
         const params = new URLSearchParams({
             stop_when_error: true,
             mode: 'sequential',

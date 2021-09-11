@@ -33,19 +33,20 @@ You can see the number of forwarded emails for a given alias just next to it.
 ## Only for Synology MailPlus
 
 This extension can only be used by default by administrators of a [Synology MailPlus Server](https://www.synology.com/fr-fr/dsm/feature/mailplus). DSM users that are not administrators need to have a
-delegated permission to access aliases and security features.
+delegated permission to access aliases and security features and need to be in at least on domain.
 
 To delegate the access, the administrator need to open the MailPlus Server application in DSM and do the following:
 
 * Go to "Account" > "Delegation"
 * Click on "+" to add a delegation
 * Select the "Custom" delegation profile
-* Check "Domain > Alias" and "Security > Mail Delivery Security" (to block/unblock aliases)
+* (Mandatory) Check "Domain > Alias"
+* (Optional, for enhanced functionalities) Check "Security > Mail Delivery Security" (to block/unblock aliases) and "Auditing > Usage Analysis" (to get forward count).
 * Add the users or group you want to have those permissions in the second tab
 * Click "OK"
 
-:warning: This extension does not allow touching other user's data, however with the previous DSM permissions, the users will in theory be able to edit EVERY blacklist/whitelist rules, other "Mail
-Delivery Security" features and EVERY alias for every user from the DSM interface or with API requests.
+:warning: This extension does not allow touching other user's data, however with the previous DSM permissions, the user will be able to edit a lot of MailPlus Server settings for other users from the
+DSM interface or with API requests. I advise you to check what these permissions will allow your users to do and see if you are ok with that.
 
 ## Install
 

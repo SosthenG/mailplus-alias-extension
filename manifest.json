@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "MailPlus Alias",
-  "version": "1.1",
+  "version": "1.0.1",
   "description": "Allows to create mail alias for Synology MailPlus Server directly from the browser, like the Firefox Relay extension but with your own domain(s).",
   "icons": {
     "48": "icon.png"
