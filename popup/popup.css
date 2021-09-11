@@ -217,10 +217,6 @@ td.block label {
     display: inline-block;
 }
 
-span.number {
-    margin-right: 1em;
-}
-
 .gg-trash {
     box-sizing: border-box;
     position: relative;
@@ -306,27 +302,4 @@ span.number {
     left: 2px;
     top: 2px;
     box-shadow: 0 4px 0,0 8px 0;
-}
-
-.gg-mail-forward,
-.gg-mail-forward::before {
-    display: inline-block;
-    box-sizing: border-box;
-    height: 6px;
-    border-top: 2px solid
-}
-.gg-mail-forward {
-    border-left: 2px solid;
-    border-top-left-radius: 4px;
-    position: relative;
-    width: 14px
-}
-.gg-mail-forward::before {
-    content: "";
-    position: absolute;
-    width: 6px;
-    border-right: 2px solid;
-    top: -4px;
-    right: -1px;
-    transform: rotate(45deg)
 }

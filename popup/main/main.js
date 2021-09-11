@@ -61,18 +61,12 @@ function addAlias(alias, email, create = false) {
 
     let alias_td = tr.insertCell();
     alias_td.classList.add('alias');
-    alias_td.appendChild(document.createTextNode(email));
+    alias_td.appendChild(document.createTextNode(alias));
 
     let stats_td = tr.insertCell();
     stats_td.classList.add('stats');
     stats_td.setAttribute('data-tooltip', 'Forwards count');
-    let number_span = document.createElement('span');
-    number_span.classList.add('number');
-    number_span.appendChild(document.createTextNode('0'));
-    stats_td.appendChild(number_span);
-    let stats_btn = document.createElement('i');
-    stats_btn.classList.add('gg-mail-forward', 'mr-1');
-    stats_td.appendChild(stats_btn);
+    stats_td.appendChild(document.createTextNode('0'));
 
     let block_td = tr.insertCell();
     block_td.classList.add('block');
@@ -149,7 +143,7 @@ function loadAliases() {
         // Add forward stats
         client.fetchStats().then((aliases_stats) => {
             for (let alias in aliases_stats) {
-                let elem = document.querySelector('tbody > tr[data-alias="' + alias + '"] > td.stats > span.number');
+                let elem = document.querySelector('tbody > tr[data-alias="' + alias + '"] > td.stats');
                 if (elem !== null) {
                     elem.innerHTML = aliases_stats[alias];
                 }
